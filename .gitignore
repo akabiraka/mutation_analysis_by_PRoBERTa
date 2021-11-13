@@ -128,6 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+data/*
 data/fastas/*.fasta
 data/pdbs/*.cif
 data/pdbs_clean/*.pdb
+data/uniprotkb_swissprot/*
+outputs/*

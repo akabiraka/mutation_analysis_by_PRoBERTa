@@ -10,14 +10,8 @@ class CleanSlate(object):
     def clean_all(self):
         data_root = "data/"
         self.clean_all_files(mydir=data_root + "fastas/", ext=".fasta")
-        self.clean_all_files(mydir=data_root + "features/", ext=".pt")
-        self.clean_all_files(mydir=data_root + "hbs/", ext=".hb2")
-        self.clean_all_files(mydir=data_root + "msas/", ext=".a3m")
         self.clean_all_files(mydir=data_root + "pdbs/", ext=".cif")
         self.clean_all_files(mydir=data_root + "pdbs_clean/", ext=".pdb")
-        self.clean_all_files(mydir=data_root + "pssms/", ext=".pssm")
-        self.clean_all_files(mydir=data_root + "sasas/", ext=".rsa")
-        self.clean_all_files(mydir=data_root + "secondary_structures/", ext=".ss")
         
     def delete_file(self, filepath):
         if os.path.exists(filepath):

@@ -45,7 +45,7 @@ for i, row in df.iterrows():
     PDBData.download_structure(pdb_id=pdb_id)
     PDBData.clean(pdb_id=pdb_id, chain_id=chain_id, selector=ChainAndAminoAcidSelect(chain_id))
     PDBData.generate_fasta_from_pdb(pdb_id=pdb_id, chain_id=chain_id, input_pdb_filepath=clean_pdb_file, save_as_fasta=True, output_fasta_dir=fastas_dir)
-    PDBData.create_mutant_fasta_file(wild_fasta_file=wild_fasta_file, mutant_fasta_file=mutant_fasta_file, mutation_site=mutation_site, wild_residue=wild_residue)
+    PDBData.create_mutant_fasta_file(wild_fasta_file=wild_fasta_file, mutant_fasta_file=mutant_fasta_file, mutation_site=mutation_site, wild_residue=wild_residue, mutation=mutation)
     
     print()
     if i+1 == n_rows_to_skip+n_rows_to_evalutate: 
