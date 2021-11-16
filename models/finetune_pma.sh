@@ -2,8 +2,8 @@
 
 #SBATCH --job-name=PMA_proberta
 #SBATCH --qos=csqos
-#SBATCH --output=/scratch/akabir4/mutation_analysis_by_PRoBERTa/argo_logs/PMA_proberta-%N-%j.output
-#SBATCH --error=/scratch/akabir4/mutation_analysis_by_PRoBERTa/argo_logs/PMA_proberta-%N-%j.error
+#SBATCH --output=/scratch/akabir4/mutation_analysis_by_PRoBERTa/outputs/argo_logs/PMA_proberta-%N-%j.output
+#SBATCH --error=/scratch/akabir4/mutation_analysis_by_PRoBERTa/outputs/argo_logs/PMA_proberta-%N-%j.error
 #SBATCH --mail-user=<akabir4@gmu.edu>
 #SBATCH --mail-type=BEGIN,END,FAIL
 
@@ -54,14 +54,13 @@ CUDA_VISIBLE_DEVICES=0 fairseq-train $DATA_DIR \
     --restore-file $ROBERTA_PATH --reset-optimizer --reset-dataloader --reset-meters \
     --init-token 0 --separator-token 2 \
     --criterion sentence_prediction --num-classes $NUM_CLASSES \
-    --optimizer lamb \
+    --optimizer adam \
     --lr-scheduler polynomial_decay --lr $PEAK_LR --warmup-updates $WARMUP_UPDATES --total-num-update $TOTAL_UPDATES \
     --dropout 0.1 --attention-dropout 0.1 --weight-decay 0.01 \
     --update-freq $UPDATE_FREQ \
     --max-update $TOTAL_UPDATES \
     --encoder-embed-dim $ENCODER_EMBED_DIM --encoder-layers $ENCODER_LAYERS \
     --save-dir "$CHECKPOINT_DIR" --save-interval 1 --save-interval-updates 100 --keep-interval-updates 5 \
-    --distributed-world-size $NUM_GPUS --ddp-backend=no_c10d \
     --best-checkpoint-metric accuracy --maximize-best-checkpoint-metric \
     --patience $PATIENCE \
     --log-format simple --log-interval 1000 2>&1 | tee -a $LOG_FILE

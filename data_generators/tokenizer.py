@@ -16,6 +16,8 @@ tokenizer_model_path = tokenizer_model_prefix+".model"
 
 fastas_dir = "data/fastas/"
 train_dataset_path = "data/dataset_5_train.csv"
+validation_dataset_path = "data/dataset_5_validation.csv"
+test_dataset_path = "data/dataset_5_test.csv"
 tokenized_dir = "data/tokenized/"
 
 
@@ -45,8 +47,8 @@ def tokenize_pretraining_seqs(model):
             with open(pretraining_tokenized_file, 'a') as filehandle:
                     filehandle.write('%s\n' % " ".join(toked))
             
-def tokenize_mutation_seqs(model, dataset_path):
-    output_file_path = tokenized_dir+"train"
+def tokenize_mutation_seqs(model, dataset_path, prefix):
+    output_file_path = tokenized_dir+prefix
     df = pd.read_csv(dataset_path)
     if os.path.exists(output_file_path):
         os.remove(output_file_path)
@@ -86,4 +88,7 @@ if __name__ == "__main__":
     model = spm.SentencePieceProcessor()
     model.load(tokenizer_model_path)
     # tokenize_pretraining_seqs(model)
-    tokenize_mutation_seqs(model, dataset_path=train_dataset_path)
+    # tokenize_mutation_seqs(model, dataset_path=train_dataset_path, prefix="train")
+    # tokenize_mutation_seqs(model, dataset_path=validation_dataset_path, prefix="val")
+    tokenize_mutation_seqs(model, dataset_path=test_dataset_path, prefix="test")
+
