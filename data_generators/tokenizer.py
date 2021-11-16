@@ -46,24 +46,36 @@ def tokenize_pretraining_seqs(model):
                     filehandle.write('%s\n' % " ".join(toked))
             
 def tokenize_mutation_seqs(model, dataset_path):
+    output_file_path = tokenized_dir+"train"
     df = pd.read_csv(dataset_path)
-    train_tokenized_file_path = tokenized_dir+"train.sequence"
-    if os.path.exists(train_tokenized_file_path):
-        os.remove(train_tokenized_file_path)
+    if os.path.exists(output_file_path):
+        os.remove(output_file_path)
     for i, row in df.iterrows():
+        label = "stabilizing" if row["ddG"]>=0 else "destabilizing"
+        inv_label = "stabilizing" if label=="destabilizing" else "destabilizing"
+        
         wild_fasta_path = fastas_dir+row["pdb_id"]+row["chain_id"]+".fasta"
         wild_seq = [record.seq for record in SeqIO.parse(wild_fasta_path, "fasta")][0]
-        wild_tokened = model.encode_as_pieces(str(wild_seq))
-        wild_tokened = " ".join(wild_tokened)
+        wild_toked = model.encode_as_pieces(str(wild_seq))
+        wild_toked = " ".join(wild_toked)
         
         mutant_fasta_path = fastas_dir+row["pdb_id"]+row["chain_id"]+"_"+row["mutation"]+".fasta"
         mutant_seq = [record.seq for record in SeqIO.parse(mutant_fasta_path, "fasta")][0]
         mutant_tokened = model.encode_as_pieces(str(mutant_seq))
         mutant_tokened = " ".join(mutant_tokened)
         
-        with open(train_tokenized_file_path, "a") as f:
-            f.write(wild_tokened + " <sep> " + mutant_tokened +"\n")
-            f.write(mutant_tokened + " <sep> " + wild_tokened +"\n")
+        with open(output_file_path+".from", "a") as f:
+            f.write(wild_toked+"\n")
+            f.write(mutant_tokened +"\n")
+        with open(output_file_path+".to", "a") as f:
+            f.write(mutant_tokened +"\n")
+            f.write(wild_toked+"\n")
+        with open(output_file_path+".label", "a") as f:
+            f.write(label +"\n")
+            f.write(inv_label +"\n")
+        with open(output_file_path+".full", "a") as f:    
+            f.write(wild_toked+","+mutant_tokened+","+label+"\n")
+            f.write(mutant_tokened+","+wild_toked+","+inv_label+"\n")
             
         # if i==5:
         #     break
