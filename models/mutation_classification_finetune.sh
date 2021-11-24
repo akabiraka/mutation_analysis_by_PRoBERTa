@@ -1,9 +1,9 @@
 #!/usr/bin/sh
 
-#SBATCH --job-name=PMA_proberta
+#SBATCH --job-name=mutation_classification
 #SBATCH --qos=csqos
-#SBATCH --output=/scratch/akabir4/mutation_analysis_by_PRoBERTa/outputs/argo_logs/PMA_proberta-%N-%j.output
-#SBATCH --error=/scratch/akabir4/mutation_analysis_by_PRoBERTa/outputs/argo_logs/PMA_proberta-%N-%j.error
+#SBATCH --output=/scratch/akabir4/mutation_analysis_by_PRoBERTa/outputs/argo_logs/mutation_classification-%N-%j.output
+#SBATCH --error=/scratch/akabir4/mutation_analysis_by_PRoBERTa/outputs/argo_logs/mutation_classification-%N-%j.error
 #SBATCH --mail-user=<akabir4@gmu.edu>
 #SBATCH --mail-type=BEGIN,END,FAIL
 
@@ -11,10 +11,13 @@
 #SBATCH --partition=gpuq
 #SBATCH --mem=16000MB
 
-PREFIX="pma"
+JOB="mutation_classification"
+DATA_DIR=data/binarized/$JOB
+OUTPUT_DIR=outputs/$JOB
+CHECKPOINT_DIR="$OUTPUT_DIR/checkpoints"
+mkdir -p $CHECKPOINT_DIR
+
 NUM_GPUS=1
-OUTPUT_DIR=outputs/pma_prediction
-DATA_DIR=data/binarized/train
 
 ENCODER_EMBED_DIM=768
 ENCODER_LAYERS=5
@@ -25,31 +28,23 @@ MAX_SENTENCES=32
 UPDATE_FREQ=64
 
 NUM_CLASSES=2
-PATIENCE=3
-ROBERTA_PATH=data/pretrained_models/checkpoint_best.pt
-
-CLASSIFICATION_HEAD="protein_mutation_analysis"
-
-# USE_CLS="<cls>"
+PATIENCE=5
 
 TOKENS_PER_SAMPLE=512
 MAX_POSITIONS=512
 
-# BATCH_SIZE=$((MAX_SENTENCES*UPDATE_FREQ*NUM_GPUS))
-
+PREFIX=$JOB
 PREFIX="$PREFIX.DIM_$ENCODER_EMBED_DIM.LAYERS_$ENCODER_LAYERS"
 PREFIX="$PREFIX.UPDATES_$TOTAL_UPDATES.WARMUP_$WARMUP_UPDATES"
 PREFIX="$PREFIX.LR_$PEAK_LR.BATCH_$MAX_SENTENCES.PATIENCE_$PATIENCE"
+LOG_FILE="$OUTPUT_DIR/$PREFIX.log"
 
-CHECKPOINT_DIR="$OUTPUT_DIR/$PREFIX/checkpoints"
-LOG_FILE="$OUTPUT_DIR/$PREFIX/$PREFIX.log"
-
-mkdir -p $CHECKPOINT_DIR
+ROBERTA_PATH=data/pretrained_models/checkpoint_best.pt
+CLASSIFICATION_HEAD=$JOB
 
 CUDA_VISIBLE_DEVICES=0 fairseq-train $DATA_DIR \
     --max-positions $MAX_POSITIONS --batch-size $MAX_SENTENCES  \
     --arch roberta_base --task sentence_prediction \
-    --bpe sentencepiece \
     --classification-head-name $CLASSIFICATION_HEAD \
     --restore-file $ROBERTA_PATH --reset-optimizer --reset-dataloader --reset-meters \
     --init-token 0 --separator-token 2 \
