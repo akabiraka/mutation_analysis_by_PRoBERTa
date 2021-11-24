@@ -68,16 +68,16 @@ def tokenize_mutation_seqs(model, dataset_path, prefix):
         
         with open(output_file_path+".from", "a") as f:
             f.write(wild_toked+"\n")
-            f.write(mutant_tokened +"\n")
+            # f.write(mutant_tokened +"\n")
         with open(output_file_path+".to", "a") as f:
             f.write(mutant_tokened +"\n")
-            f.write(wild_toked+"\n")
+            # f.write(wild_toked+"\n")
         with open(output_file_path+".label", "a") as f:
             f.write(label +"\n")
-            f.write(inv_label +"\n")
+            # f.write(inv_label +"\n")
         with open(output_file_path+".full", "a") as f:    
             f.write(wild_toked+","+mutant_tokened+","+label+"\n")
-            f.write(mutant_tokened+","+wild_toked+","+inv_label+"\n")
+            # f.write(mutant_tokened+","+wild_toked+","+inv_label+"\n")
             
         # if i==5:
         #     break
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     model = spm.SentencePieceProcessor()
     model.load(tokenizer_model_path)
     # tokenize_pretraining_seqs(model)
-    # tokenize_mutation_seqs(model, dataset_path=train_dataset_path, prefix="train")
-    # tokenize_mutation_seqs(model, dataset_path=validation_dataset_path, prefix="val")
+    tokenize_mutation_seqs(model, dataset_path=train_dataset_path, prefix="train")
+    tokenize_mutation_seqs(model, dataset_path=validation_dataset_path, prefix="val")
     tokenize_mutation_seqs(model, dataset_path=test_dataset_path, prefix="test")
 
