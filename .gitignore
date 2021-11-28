@@ -127,7 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
+*.swp
 data/*
 data/fastas/*.fasta
 data/pdbs/*.cif
