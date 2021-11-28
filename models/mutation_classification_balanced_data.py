@@ -11,7 +11,7 @@ label_col=2
 classification_head="mutation_classification"
 pretrained_model_dir = "data/pretrained_models/"
 
-data =  pd.read_csv("data/bpe_tokenized/test.from", header=None)
+data =  pd.read_csv("data/bpe_tokenized/train.full", header=None)
 print(data.shape)
 
 split_num=int(len(data) / batch_size)
@@ -24,9 +24,14 @@ print(roberta_model)
 
 for count, batch_df in enumerate(batched_data):
     for tokens in batch_df.itertuples(index=False):
-        print(tokens[from_col])#, tokens[to_col], tokens[label_col])
+        print(tokens[from_col], tokens[to_col], tokens[label_col])
+
         encoded = roberta_model.encode(tokens[from_col])#, tokens[to_col])
         print(encoded)
+        
+        last_layer_features = roberta_model.extract_features(encoded)
+        print("last_layer_feature_size: ", last_layer_features.size())
+
         decoded = roberta_model.decode(encoded)
         print(decoded)
         # torch.ones(512, dtype = torch.long) 
