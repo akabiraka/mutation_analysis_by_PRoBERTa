@@ -12,7 +12,7 @@
 #SBATCH --mem=16000MB
 
 JOB="mutation_classification"
-DATA_DIR=data/binarized/$JOB
+DATA_DIR=data/bpe_binarized/$JOB
 OUTPUT_DIR=outputs/$JOB
 CHECKPOINT_DIR="$OUTPUT_DIR/checkpoints"
 mkdir -p $CHECKPOINT_DIR
@@ -45,10 +45,11 @@ CLASSIFICATION_HEAD=$JOB
 CUDA_VISIBLE_DEVICES=0 fairseq-train $DATA_DIR \
     --max-positions $MAX_POSITIONS --batch-size $MAX_SENTENCES  \
     --arch roberta_base --task sentence_prediction \
-    --classification-head-name $CLASSIFICATION_HEAD \
+    --bpe sentencepiece \
     --restore-file $ROBERTA_PATH --reset-optimizer --reset-dataloader --reset-meters \
     --init-token 0 --separator-token 2 \
     --criterion sentence_prediction --num-classes $NUM_CLASSES \
+    --classification-head-name $CLASSIFICATION_HEAD \
     --optimizer adam \
     --lr-scheduler polynomial_decay --lr $PEAK_LR --warmup-updates $WARMUP_UPDATES --total-num-update $TOTAL_UPDATES \
     --dropout 0.1 --attention-dropout 0.1 --weight-decay 0.01 \

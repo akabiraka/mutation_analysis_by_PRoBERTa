@@ -12,13 +12,13 @@ pretraining_file = "data/pretraining_data_for_tokenizer.txt"
 pretraining_tokenized_file = "data/pretraining_data_tokenized.txt"
 
 tokenizer_model_prefix = "outputs/models/spm_tokenizer"
-tokenizer_model_path = tokenizer_model_prefix+".model"
+tokenizer_model_path = "data/bpe_model/m_reviewed.model" #tokenizer_model_prefix+".model"
 
 fastas_dir = "data/fastas/"
 train_dataset_path = "data/dataset_5_train.csv"
 validation_dataset_path = "data/dataset_5_validation.csv"
 test_dataset_path = "data/dataset_5_test.csv"
-tokenized_dir = "data/tokenized/"
+tokenized_dir = "data/bpe_tokenized/" #"data/tokenized/"
 
 
 
@@ -54,7 +54,7 @@ def tokenize_mutation_seqs(model, dataset_path, prefix):
         os.remove(output_file_path)
     for i, row in df.iterrows():
         label = "stabilizing" if row["ddG"]>=0 else "destabilizing"
-        inv_label = "stabilizing" if label=="destabilizing" else "destabilizing"
+        # inv_label = "stabilizing" if label=="destabilizing" else "destabilizing"
         
         wild_fasta_path = fastas_dir+row["pdb_id"]+row["chain_id"]+".fasta"
         wild_seq = [record.seq for record in SeqIO.parse(wild_fasta_path, "fasta")][0]
@@ -83,8 +83,8 @@ def tokenize_mutation_seqs(model, dataset_path, prefix):
         #     break
     
 if __name__ == "__main__":
-    filter_seqs()
-    train_tokenizer()
+    # filter_seqs()
+    # train_tokenizer()
     model = spm.SentencePieceProcessor()
     model.load(tokenizer_model_path)
     # tokenize_pretraining_seqs(model)
