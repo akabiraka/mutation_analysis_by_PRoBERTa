@@ -14,4 +14,5 @@
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=16000MB
 
-python analyzers/vocab_embedding.py 
+##python analyzers/vocab_embedding.py 
+python analyzers/protein_seq_embedding.py
