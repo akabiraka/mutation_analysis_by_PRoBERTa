@@ -1,8 +1,10 @@
 import numpy as np
 import pandas as pd
 import os
+import time
 import torch
 from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt     
 from fairseq.models.roberta import RobertaModel
 
@@ -36,6 +38,44 @@ def get_all_vocab_features(force=False):
     with open(out_file, "rb") as f: return np.load(f)
 
 
+def plot_pca(all_vocab_features):
+    pca = PCA(n_components=3)
+    pca_result = pca.fit_transform(all_vocab_features)
+    print("PCA:", pca.explained_variance_ratio_)
+
+    pca_one = pca_result[:, 0]
+    pca_two = pca_result[:, 1] 
+    pca_three = pca_result[:, 2]
+
+    ax = plt.figure(figsize=(16,10)).gca(projection='3d')
+    ax.scatter(xs=pca_one, ys=pca_two, zs=pca_three, c=pca_three, cmap='Greens')
+    ax.set_xlabel('Component-one')
+    ax.set_ylabel('Component-two')
+    ax.set_zlabel('Component-three')
+    plt.savefig("outputs/images/vocab-embedding-pca.pdf", dpi=300, format="pdf", bbox_inches='tight', pad_inches=0.0)
+    plt.close()
+
+
+def plot_tsne(all_vocab_features):
+    time_start = time.time()
+    tsne = TSNE(n_components=3, verbose=1, perplexity=40, n_iter=300)
+    tsne_results = tsne.fit_transform(all_vocab_features)
+    print('t-SNE done! Time elapsed: {} seconds'.format(time.time()-time_start))
+
+    tsne_one = tsne_results[:,0]
+    tsne_two = tsne_results[:,1]
+    tsne_three = tsne_results[:,2]
+
+    ax = plt.figure(figsize=(16,10)).gca(projection='3d')
+    ax.scatter(xs=tsne_one, ys=tsne_two, zs=tsne_three, c=tsne_three, cmap='Greens')
+    ax.set_xlabel('Component-one')
+    ax.set_ylabel('Component-two')
+    ax.set_zlabel('Component-three')
+    plt.savefig("outputs/images/vocab-embedding-tsne.pdf", dpi=300, format="pdf", bbox_inches='tight', pad_inches=0.0)
+    plt.close()
+
+
+
 pretrained_model_dir="data/pretrained_models/"
 vocab_path="data/pretrained_models/dict.txt"
 sentencepiece_model_path="data/bpe_model/m_reviewed.model"
@@ -47,20 +87,6 @@ print(vocab_df.shape)
 #print(vocab_df.head())
 
 all_vocab_features = get_all_vocab_features(force=False)
-
-pca = PCA(n_components=3)
-pca_result = pca.fit_transform(all_vocab_features)
-print(pca.explained_variance_ratio_)
-
-pca_one = pca_result[:, 0]
-pca_two = pca_result[:, 1] 
-pca_three = pca_result[:, 2]
-
-
-ax = plt.figure(figsize=(16,10)).gca(projection='3d')
-ax.scatter(xs=pca_one, ys=pca_two, zs=pca_three, c=pca_three, cmap='Greens')
-ax.set_xlabel('pca-one')
-ax.set_ylabel('pca-two')
-ax.set_zlabel('pca-three')
-plt.savefig("outputs/images/vocab_embedding.pdf", dpi=300, format="pdf", bbox_inches='tight', pad_inches=0.0)
+plot_pca(all_vocab_features)
+plot_tsne(all_vocab_features)
 
