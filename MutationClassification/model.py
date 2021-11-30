@@ -1,8 +1,4 @@
 import sys
-<<<<<<< HEAD
-=======
-from matplotlib.pyplot import cla
->>>>>>> e4807441a5be56a07a95c3706c06138b3e139ea9
 sys.path.append("../mutation_analysis_by_PRoBERTa")
 
 import numpy as np
@@ -14,19 +10,12 @@ from fairseq.data.data_utils import collate_tokens
 from fairseq.models.roberta import RobertaModel
 
 class Net(nn.Module):
-<<<<<<< HEAD
     def __init__(self, device, freeze_pretrained_bert=True, drop_prob=0.5):
         super().__init__()
         self.device=device
         self.roberta_model = RobertaModel.from_pretrained(model_name_or_path="data/pretrained_models/", checkpoint_file="checkpoint_best.pt", 
                                                      bpe="sentencepiece", sentencepiece_model="data/bpe_model/m_reviewed.model")
         self.roberta_model.to(self.device)
-=======
-    def __init__(self, freeze_pretrained_bert=True, drop_prob=0.5):
-        super().__init__()
-        self.roberta_model = RobertaModel.from_pretrained(model_name_or_path="data/pretrained_models/", checkpoint_file="checkpoint_best.pt", 
-                                                     bpe="sentencepiece", sentencepiece_model="data/bpe_model/m_reviewed.model")
->>>>>>> e4807441a5be56a07a95c3706c06138b3e139ea9
         if freeze_pretrained_bert: self.roberta_model.eval()
         
         self.classifier = nn.Sequential(
@@ -34,23 +23,14 @@ class Net(nn.Module):
             nn.Dropout(p=drop_prob)
         )
         self.sigmoid = nn.Sigmoid()
-<<<<<<< HEAD
-=======
-        # self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
->>>>>>> e4807441a5be56a07a95c3706c06138b3e139ea9
         
     
     def forward(self, wild_tokens, mut_tokens):
         wild_encoded = self.roberta_model.encode(wild_tokens)
         mut_encoded = self.roberta_model.encode(mut_tokens)
         
-<<<<<<< HEAD
         wild_features = self.roberta_model.extract_features(wild_encoded).sum(dim=1).squeeze().to(self.device)
         mut_features = self.roberta_model.extract_features(mut_encoded).sum(dim=1).squeeze().to(self.device)
-=======
-        wild_features = self.roberta_model.extract_features(wild_encoded).sum(dim=1).squeeze()
-        mut_features = self.roberta_model.extract_features(mut_encoded).sum(dim=1).squeeze()
->>>>>>> e4807441a5be56a07a95c3706c06138b3e139ea9
         # print(wild_features.shape, mut_features.shape)
         
         all_features = wild_features+mut_features
@@ -64,7 +44,6 @@ class Net(nn.Module):
 class Classification(object):
     def __init__(self):
         super().__init__()
-<<<<<<< HEAD
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         print(self.device)
         self.model = Net(self.device, freeze_pretrained_bert=True, drop_prob=0.5).to(self.device)
@@ -73,13 +52,6 @@ class Classification(object):
         
             
     def data_setup(self, data_path, batch_size=1):
-=======
-        self.model = Net(freeze_pretrained_bert=True, drop_prob=0.5)
-        self.criterion = nn.CrossEntropyLoss()
-        self.optimizer = optim.Adam(self.model.parameters(), lr=0.0001, weight_decay=0.01)
-            
-    def data_setup(self, data_path="data/bpe_tokenized/train.full", batch_size=1):
->>>>>>> e4807441a5be56a07a95c3706c06138b3e139ea9
         data =  pd.read_csv(data_path, header=None)
         print(data.shape)
 
@@ -88,7 +60,6 @@ class Classification(object):
         print("Total batches: " + str(len(batched_data)))
         return batched_data
     
-<<<<<<< HEAD
     
     def get_batched_data(self, data_path, batch_size=1):
         wild_col, mut_col, label_col = 0, 1, 2
@@ -140,15 +111,11 @@ class Classification(object):
     
     
     def run_batch(self, batch_df):
-=======
-    def run_epoch(self, batch_df):
->>>>>>> e4807441a5be56a07a95c3706c06138b3e139ea9
         wild_col, mut_col, label_col=0,1,2
         losses = []
         for tokens in batch_df.itertuples(index=False):
             # print(tokens[wild_col], tokens[mut_col], tokens[label_col])
             target_cls = 1 if tokens[label_col]=="stabilizing" else 0
-<<<<<<< HEAD
             target_cls = torch.tensor([target_cls], dtype=torch.long).to(self.device)
             
             pred_cls = self.model(tokens[wild_col], tokens[mut_col])
@@ -208,34 +175,3 @@ val_data_path="data/bpe_tokenized/val.full"
 task = Classification()
 task.run(train_data_path, val_data_path, n_epochs=10, batch_size=32)    
 
-=======
-            
-            pred_cls = self.model(tokens[wild_col], tokens[mut_col])
-            pred_cls = pred_cls.unsqueeze(dim=0)
-            
-            # print("here", pred_cls, torch.tensor([target_cls], dtype=torch.long))    
-            loss = self.criterion(pred_cls, torch.tensor([target_cls], dtype=torch.long))
-            losses.append(loss)
-            # print(loss)
-        epoch_loss = torch.stack(losses).mean()
-        return epoch_loss
-        
-    def train(self):
-        batched_data = self.data_setup(data_path="data/bpe_tokenized/train.full", batch_size=2)
-        
-        for count, batch_df in enumerate(batched_data):
-            print(batch_df.shape)
-            self.model.train()
-            self.model.zero_grad()
-            epoch_loss=self.run_epoch(batch_df)  
-            epoch_loss.backward()
-            print(epoch_loss)
-            self.optimizer.step() 
-             
-            break
-                
-    
-    
-task = Classification()
-task.train()    
->>>>>>> e4807441a5be56a07a95c3706c06138b3e139ea9
