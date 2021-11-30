@@ -15,4 +15,5 @@
 #SBATCH --mem=16000MB
 
 ##python analyzers/vocab_embedding.py 
-python analyzers/protein_seq_embedding.py
+##python analyzers/protein_seq_embedding.py
+python MutationClassification/model.py
