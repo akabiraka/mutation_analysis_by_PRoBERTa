@@ -3,16 +3,22 @@
 ## this must be run from directory where run.py exists.
 ## --workdir is not used in this file.
 
-#SBATCH --job-name=general
+#SBATCH --job-name=5_mut_classify
 #SBATCH --qos=csqos
-#SBATCH --output=/scratch/akabir4/mutation_analysis_by_PRoBERTa/outputs/argo_logs/general-%N-%j.output
-#SBATCH --error=/scratch/akabir4/mutation_analysis_by_PRoBERTa/outputs/argo_logs/general-%N-%j.error
+#SBATCH --output=/scratch/akabir4/mutation_analysis_by_PRoBERTa/outputs/argo_logs/5_mut_classify-%N-%j.output
+#SBATCH --error=/scratch/akabir4/mutation_analysis_by_PRoBERTa/outputs/argo_logs/5_mut_classify-%N-%j.error
 #SBATCH --mail-user=<akabir4@gmu.edu>
 #SBATCH --mail-type=BEGIN,END,FAIL
 
-#SBATCH --partition=all-HiPri
-#SBATCH --cpus-per-task=2
+##cpu jobs
+##SBATCH --partition=all-HiPri
+##SBATCH --cpus-per-task=4
+
+##GPU jobs
+#SBATCH --partition=gpuq
+#SBATCH --gres=gpu:1
 #SBATCH --mem=16000MB
+##SBATCH --time=1-24:00
 
 ##python analyzers/vocab_embedding.py 
 ##python analyzers/protein_seq_embedding.py

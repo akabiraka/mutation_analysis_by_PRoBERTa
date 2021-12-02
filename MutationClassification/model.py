@@ -42,26 +42,29 @@ class Net(nn.Module):
     
 
 class Classification(object):
-    def __init__(self):
+    def __init__(self, init_lr, n_epochs, batch_size):
         super().__init__()
+        self.init_lr=init_lr
+        self.n_epochs=n_epochs
+        self.batch_size=batch_size
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        print(self.device)
+
         self.model = Net(self.device, freeze_pretrained_bert=True, drop_prob=0.5).to(self.device)
         self.criterion = nn.CrossEntropyLoss()
-        self.optimizer = optim.Adam(self.model.parameters(), lr=0.0001, weight_decay=0.01)
+        self.optimizer = optim.Adam(self.model.parameters(), lr=self.init_lr, weight_decay=0.01)
         
             
-    def data_setup(self, data_path, batch_size=1):
+    def data_setup(self, data_path):
         data =  pd.read_csv(data_path, header=None)
         print(data.shape)
 
-        split_num=int(len(data) / batch_size)
+        split_num=int(len(data) / self.batch_size)
         batched_data=np.array_split(data, split_num)
         print("Total batches: " + str(len(batched_data)))
         return batched_data
     
     
-    def get_batched_data(self, data_path, batch_size=1):
+    def get_batched_data(self, data_path):
         wild_col, mut_col, label_col = 0, 1, 2
         data =  pd.read_csv(data_path, header=None)
 
@@ -70,7 +73,7 @@ class Classification(object):
         stab_n_rows, destab_n_rows = stabilizing.shape[0], destabilizing.shape[0]
         print(stab_n_rows, destab_n_rows)
 
-        sample_size=int(batch_size/2)
+        sample_size=int(self.batch_size/2)
         batched_data = []
         while destab_n_rows > 0:
             restart_stab_sampling_flag=False
@@ -81,7 +84,7 @@ class Classification(object):
             # if destabilizing rows < sample_size, select downsized batch
             elif destab_n_rows<sample_size:
                 sample_size=destab_n_rows
-            else: sample_size=int(batch_size/2)
+            else: sample_size=int(self.batch_size/2)
             
             # random sampling from stabilizing and destabilizing
             stab_sampled = stabilizing.sample(n=sample_size)
@@ -129,8 +132,8 @@ class Classification(object):
         return batch_loss
     
     
-    def train(self, train_data_path, batch_size):
-        batched_data = self.get_batched_data(train_data_path, batch_size)
+    def train(self, train_data_path):
+        batched_data = self.get_batched_data(train_data_path)
         self.model.train()
         losses = []
         for batch_no, batch_df in enumerate(batched_data):
@@ -152,26 +155,28 @@ class Classification(object):
         val_loss = self.run_batch(data)
         return val_loss.item()
         
-    def run(self, train_data_path, val_data_path, n_epochs, batch_size):
+    def run(self, train_data_path, val_data_path):
         best_loss = np.inf        
         train_losses = []
         val_losses = []
-        for epoch in range(1, n_epochs+1):
-            train_loss = self.train(train_data_path, batch_size)
+        model_path="outputs/models/mut_classify_lr_{}_epoch_{}_batch_{}.pt".format(self.init_lr, self.n_epochs, self.batch_size)
+
+        for epoch in range(1, self.n_epochs+1):
+            train_loss = self.train(train_data_path)
             val_loss = self.validate(val_data_path)
-            print("[{}/{}] train_loss:{:.4f}, val_loss:{:.4f}".format(epoch, n_epochs, train_loss, val_loss))
+            print("[{}/{}] train_loss:{:.4f}, val_loss:{:.4f}".format(epoch, self.n_epochs, train_loss, val_loss))
             train_losses.append(train_loss)
             val_losses.append(val_loss)
             
             if val_loss < best_loss:
-                torch.save(self.model.state_dict(), "outputs/models/mut_classification_best.pt")
-            break
+                torch.save(self.model.state_dict(), model_path) 
+            #break
         print("train_losses: ", train_losses)
         print("val_losses: ", val_losses)
                 
     
 train_data_path="data/bpe_tokenized/train.full"    
 val_data_path="data/bpe_tokenized/val.full"    
-task = Classification()
-task.run(train_data_path, val_data_path, n_epochs=10, batch_size=32)    
+task = Classification(init_lr=0.00001, batch_size=32,  n_epochs=50)
+task.run(train_data_path, val_data_path)    
 
