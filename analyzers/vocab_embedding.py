@@ -1,3 +1,6 @@
+import sys
+sys.path.append("../mutation_analysis_by_PRoBERTa")
+
 import numpy as np
 import pandas as pd
 import os
@@ -7,6 +10,9 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt     
 from fairseq.models.roberta import RobertaModel
+from analyzers.plot_embeddings import *
+
+
 
 def get_all_vocab_features(force=False):
     out_file="outputs/npy_data/all_vocab_features.npy"
@@ -38,43 +44,68 @@ def get_all_vocab_features(force=False):
     with open(out_file, "rb") as f: return np.load(f)
 
 
-def plot_pca(all_vocab_features):
-    pca = PCA(n_components=3)
-    pca_result = pca.fit_transform(all_vocab_features)
-    print("PCA:", pca.explained_variance_ratio_)
+# def plot_multi_pca(features, out_dir, out_prefix, annotations=None, save=False):
+#     pca = PCA(n_components=3)
+#     pca_result = pca.fit_transform(features)
+#     print("PCA:", pca.explained_variance_ratio_)
 
-    pca_one = pca_result[:, 0]
-    pca_two = pca_result[:, 1] 
-    pca_three = pca_result[:, 2]
+#     pca_one = pca_result[:, 0]
+#     pca_two = pca_result[:, 1] 
+#     pca_three = pca_result[:, 2]
 
-    ax = plt.figure(figsize=(16,10)).gca(projection='3d')
-    ax.scatter(xs=pca_one, ys=pca_two, zs=pca_three, c=pca_three, cmap='Greens')
-    ax.set_xlabel('Component-one')
-    ax.set_ylabel('Component-two')
-    ax.set_zlabel('Component-three')
-    plt.savefig("outputs/images/vocab-embedding-pca.pdf", dpi=300, format="pdf", bbox_inches='tight', pad_inches=0.0)
-    plt.close()
+#     j=0
+#     while j!=10000:
+#         fig = plt.figure()
+#         ax = fig.add_subplot(projection='3d')
+#         print(j)
+#         n_vocabs=500
+#         for i in range(j, j+n_vocabs): # plot each point + it's index as text above
+#             x = pca_one[i]
+#             y = pca_two[i]
+#             z = pca_three[i]
+#             label = annotations[i]
+#             ax.scatter(x, y, z, c=z, marker=".", alpha=0.0)
+#             ax.text(x, y, z, label, size=5)
+#         j=j+n_vocabs    
+#         if save:
+#             plt.savefig(out_dir+out_prefix+"_"+str(j)+".pdf", dpi=300, format="pdf", bbox_inches='tight', pad_inches=0.0)
+#             plt.close()
+#         else:
+#             plt.show()
+#             # plt.close()
+#         # break
 
+# def plot_multi_tsne(features, out_dir, out_prefix, annotations=None, save=False):
+#     time_start = time.time()
+#     tsne = TSNE(n_components=3, verbose=1, perplexity=40, n_iter=300)
+#     tsne_results = tsne.fit_transform(features)
+#     print('t-SNE done! Time elapsed: {} seconds'.format(time.time()-time_start))
 
-def plot_tsne(all_vocab_features):
-    time_start = time.time()
-    tsne = TSNE(n_components=3, verbose=1, perplexity=40, n_iter=300)
-    tsne_results = tsne.fit_transform(all_vocab_features)
-    print('t-SNE done! Time elapsed: {} seconds'.format(time.time()-time_start))
+#     tsne_one = tsne_results[:,0]
+#     tsne_two = tsne_results[:,1]
+#     tsne_three = tsne_results[:,2]
 
-    tsne_one = tsne_results[:,0]
-    tsne_two = tsne_results[:,1]
-    tsne_three = tsne_results[:,2]
-
-    ax = plt.figure(figsize=(16,10)).gca(projection='3d')
-    ax.scatter(xs=tsne_one, ys=tsne_two, zs=tsne_three, c=tsne_three, cmap='Greens')
-    ax.set_xlabel('Component-one')
-    ax.set_ylabel('Component-two')
-    ax.set_zlabel('Component-three')
-    plt.savefig("outputs/images/vocab-embedding-tsne.pdf", dpi=300, format="pdf", bbox_inches='tight', pad_inches=0.0)
-    plt.close()
-
-
+#     j=0
+#     while j!=10000:
+#         fig = plt.figure()
+#         ax = fig.add_subplot(projection='3d')
+#         print(j)
+#         n_vocabs=500
+#         for i in range(j, j+n_vocabs): # plot each point + it's index as text above
+#             x = tsne_one[i]
+#             y = tsne_two[i]
+#             z = tsne_three[i]
+#             label = annotations[i]
+#             ax.scatter(x, y, z, c=z, marker=".", alpha=0.0)
+#             ax.text(x, y, z, label, size=5)
+#         j=j+n_vocabs    
+#         if save:
+#             plt.savefig(out_dir+out_prefix+"_"+str(j)+".pdf", dpi=300, format="pdf", bbox_inches='tight', pad_inches=0.0)
+#             plt.close()
+#         else:
+#             plt.show()
+#             # plt.close()
+#         # break
 
 pretrained_model_dir="data/pretrained_models/"
 vocab_path="data/pretrained_models/dict.txt"
@@ -84,9 +115,17 @@ vocab_col=0
 freq_col=1
 vocab_df = pd.read_csv(vocab_path, header=None, delimiter=" ")
 print(vocab_df.shape)
-#print(vocab_df.head())
+print(vocab_df.head())
+
 
 all_vocab_features = get_all_vocab_features(force=False)
-plot_pca(all_vocab_features)
-plot_tsne(all_vocab_features)
+
+plot_pca(all_vocab_features, "outputs/images/embeddings/vocab_pca_embed.pdf", save=True)
+plot_tsne(all_vocab_features, "outputs/images/embeddings/vocab_tsne_embed.pdf", save=True)
+
+
+annotations=vocab_df[0].tolist()
+print(annotations)
+plot_multi_pca(all_vocab_features, "outputs/images/vocab_pca/", "embedding", annotations=annotations, n_items=10000, incr_amt=500, save=True)
+plot_multi_tsne(all_vocab_features, "outputs/images/vocab_tsne/", "embedding", annotations=annotations, n_items=10000, incr_amt=500, save=True)
 

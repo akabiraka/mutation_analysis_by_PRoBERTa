@@ -1,7 +1,5 @@
 # Mutation stability analysis using PRoBERTa
 
-
-
 #### Data preparation
 
 | Name       | File path                     | #Proteins | #Stabilizing | #Destabilizing |
@@ -27,7 +25,6 @@
 All the following links corresponds to PRoBERTa:
 
 * Paper: Transforming the Language of Life: Transformer Neural Networks for Protein Prediction Tasks
-
 * Github link: https://github.com/annambiar/PRoBERTa
 
 Download the following pretrained models from PRoBERTa:
@@ -50,4 +47,9 @@ Download the following pretrained models from PRoBERTa:
   * This `MutationClassification/model.py` contains:
     * `Net`: This is the neural network class.
     * `Classification`: This does random sampling without replacement in function `get_batched_data`, `train` and `validate` the model. The `run` function does all the works.
-  *
+
+#### Analysis
+
+* To draw vocabulary embedding: `python analyzers/vocab_embedding.py`
+* To draw sequence embedding: `python analyzers/seq_embedding.py`
+*
