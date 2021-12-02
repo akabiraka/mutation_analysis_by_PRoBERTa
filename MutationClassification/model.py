@@ -42,7 +42,7 @@ class Net(nn.Module):
     
 
 class Classification(object):
-    def __init__(self, init_lr, n_epochs, batch_size):
+    def __init__(self, init_lr, batch_size, n_epochs):
         super().__init__()
         self.init_lr=init_lr
         self.n_epochs=n_epochs
@@ -159,7 +159,7 @@ class Classification(object):
         best_loss = np.inf        
         train_losses = []
         val_losses = []
-        model_path="outputs/models/mut_classify_lr_{}_epoch_{}_batch_{}.pt".format(self.init_lr, self.n_epochs, self.batch_size)
+        model_path="outputs/models_mut_classify_balanced_data/mut_classify_lr_{}_epoch_{}_batch_{}.pt".format(self.init_lr, self.n_epochs, self.batch_size)
 
         for epoch in range(1, self.n_epochs+1):
             train_loss = self.train(train_data_path)
@@ -177,6 +177,6 @@ class Classification(object):
     
 train_data_path="data/bpe_tokenized/train.full"    
 val_data_path="data/bpe_tokenized/val.full"    
-task = Classification(init_lr=0.00001, batch_size=32,  n_epochs=50)
+task = Classification(init_lr=0.00001, batch_size=64, n_epochs=50)
 task.run(train_data_path, val_data_path)    
 
