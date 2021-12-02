@@ -93,6 +93,12 @@ def compute_features(inp_dataset_path, force=False):
 if __name__ == "__main__":
     pdb_ids_df, features =compute_features(train_dataset_path, force=False) 
     print(pdb_ids_df.shape, features.shape)
-    plot_pca(features, "outputs/images/pdb-embedding-pca.pdf")
-    plot_tsne(features, "outputs/images/pdb-embedding-tsne.pdf")
+    
+    plot_pca(features, "outputs/images/embeddings/seq_pca_embed.pdf", save=True)
+    plot_tsne(features, "outputs/images/embeddings/seq_tsne_embed.pdf", save=True)
+    
+    annotations = pdb_ids_df[0].tolist()
+    # print(len(annotations))
+    plot_multi_pca(features, "outputs/images/seq_pca/", "embedding", annotations=annotations, n_items=4000, incr_amt=200, save=True)
+    plot_multi_tsne(features, "outputs/images/seq_tsne/", "embedding", annotations=annotations, n_items=4000, incr_amt=200, save=True)
     
