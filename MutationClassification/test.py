@@ -22,7 +22,7 @@ roberta_model.eval()
 
 criterion = nn.CrossEntropyLoss()
 
-def print_metrics(self, target_classes, pred_classes):
+def print_metrics(target_classes, pred_classes):
     from sklearn.metrics import confusion_matrix, accuracy_score, recall_score, precision_score, f1_score, roc_curve, auc, log_loss
     print("confusion_matrix: ", confusion_matrix(target_classes, pred_classes))
     print("accuracy: ", accuracy_score(target_classes, pred_classes))
@@ -45,6 +45,10 @@ def run_batch(batch_df):
         
         wild_encoded = roberta_model.encode(tokens[wild_col])
         mut_encoded = roberta_model.encode(tokens[mut_col])
+        
+        if len(wild_encoded)>512 or len(mut_encoded)>512:
+            print("tokens exceeds maximum length: {}, {} > 512".format(len(wild_encoded), len(mut_encoded)))
+            continue
         wild_features = roberta_model.extract_features(wild_encoded).sum(dim=1).squeeze().to(device)
         mut_features = roberta_model.extract_features(mut_encoded).sum(dim=1).squeeze().to(device)
         # print(wild_features.shape, mut_features.shape)
@@ -61,6 +65,7 @@ def run_batch(batch_df):
         # break
         
     batch_loss = torch.stack(losses).mean()
+    print("Cross entropy loss: ", batch_loss)
     print_metrics(target_classes, pred_classes)
         
 

@@ -3,10 +3,10 @@
 ## this must be run from directory where run.py exists.
 ## --workdir is not used in this file.
 
-#SBATCH --job-name=6_mut_classify
+#SBATCH --job-name=mut_classify
 #SBATCH --qos=csqos
-#SBATCH --output=/scratch/akabir4/mutation_analysis_by_PRoBERTa/outputs/argo_logs/6_mut_classify-%N-%j.output
-#SBATCH --error=/scratch/akabir4/mutation_analysis_by_PRoBERTa/outputs/argo_logs/6_mut_classify-%N-%j.error
+#SBATCH --output=/scratch/akabir4/mutation_analysis_by_PRoBERTa/outputs/argo_logs/mut_classify-%N-%j.output
+#SBATCH --error=/scratch/akabir4/mutation_analysis_by_PRoBERTa/outputs/argo_logs/mut_classify-%N-%j.error
 #SBATCH --mail-user=<akabir4@gmu.edu>
 #SBATCH --mail-type=BEGIN,END,FAIL
 
@@ -22,4 +22,4 @@
 
 ##python analyzers/vocab_embedding.py 
 ##python analyzers/protein_seq_embedding.py
-python MutationClassification/model.py
+python MutationClassification/train.py

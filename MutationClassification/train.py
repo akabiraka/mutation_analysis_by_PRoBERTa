@@ -6,13 +6,13 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
+from sklearn.model_selection import ParameterGrid
 from MutationClassification.model import Net
 from MutationClassification.dataset import get_batched_data
 from fairseq.models.roberta import RobertaModel
 
 class Classification(object):
-    def __init__(self, init_lr, batch_size, n_epochs):
+    def __init__(self, init_lr, batch_size, n_epochs, criterion_weight):
         super().__init__()
         self.init_lr=init_lr
         self.n_epochs=n_epochs
@@ -22,7 +22,7 @@ class Classification(object):
         self.model = Net(drop_prob=0.5).to(self.device)
         self.roberta_model = self.init_roberta_model()
         
-        self.criterion = nn.CrossEntropyLoss()
+        self.criterion = nn.CrossEntropyLoss(weight=criterion_weight)
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.init_lr, weight_decay=0.01)
         
     def init_roberta_model(self):
@@ -103,7 +103,7 @@ class Classification(object):
         best_loss = np.inf        
         train_losses = []
         val_losses = []
-        model_path="outputs/models_mut_classify_balanced_data/{}_mut_classify_lr_{}_epoch_{}_batch_{}.pt".format(run_no, self.init_lr, self.n_epochs, self.batch_size)
+        model_path="outputs/models_mut_classify_balanced_data/{}_mut_classify.pt".format(run_no)
 
         for epoch in range(1, self.n_epochs+1):
             train_loss = self.train(train_data_path)
@@ -120,6 +120,16 @@ class Classification(object):
                 
     
 train_data_path="data/bpe_tokenized/train.full"    
-val_data_path="data/bpe_tokenized/val.full"    
-task = Classification(init_lr=0.001, batch_size=32, n_epochs=1)
-task.run(0, train_data_path, val_data_path)    
+val_data_path="data/bpe_tokenized/val.full"   
+
+param_grid={
+    "lr":[0.001, 0.0001, 0.00001],
+    "batch_size":[32, 64, 128],
+    "criterion_weight":[torch.tensor([0.4, 0.6]), torch.tensor([0.3, 0.7])]
+} 
+
+for run_no, params in enumerate(list(ParameterGrid(param_grid)), 1):
+    print("run: ", run_no, params["lr"], params["batch_size"], params["criterion_weight"])
+
+    task = Classification(init_lr=params["lr"], batch_size=params["batch_size"], n_epochs=50, criterion_weight=params["criterion_weight"])
+    task.run(run_no, train_data_path, val_data_path)    
