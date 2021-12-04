@@ -22,7 +22,7 @@ class Classification(object):
         self.model = Net(drop_prob=0.5).to(self.device)
         self.roberta_model = self.init_roberta_model()
         
-        self.criterion = nn.CrossEntropyLoss(weight=criterion_weight)
+        self.criterion = nn.CrossEntropyLoss(weight=criterion_weight.to(self.device))
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.init_lr, weight_decay=0.01)
         
     def init_roberta_model(self):
@@ -123,10 +123,10 @@ train_data_path="data/bpe_tokenized/train.full"
 val_data_path="data/bpe_tokenized/val.full"   
 
 param_grid={
-    "lr":[0.001, 0.0001, 0.00001],
-    "batch_size":[32, 64, 128],
-    "criterion_weight":[torch.tensor([0.4, 0.6]), torch.tensor([0.3, 0.7])]
-} 
+    "lr":[0.001, 0.0001],
+    "batch_size":[32, 64],
+    "criterion_weight":[torch.tensor([0.6, 0.4]), torch.tensor([0.5, 0.5]), torch.tensor([0.4, 0.6])]
+}
 
 for run_no, params in enumerate(list(ParameterGrid(param_grid)), 1):
     print("run: ", run_no, params["lr"], params["batch_size"], params["criterion_weight"])
