@@ -16,7 +16,7 @@
 
 ##GPU jobs
 #SBATCH --partition=gpuq
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:2
 #SBATCH --mem=16000MB
 ##SBATCH --time=1-24:00
 
