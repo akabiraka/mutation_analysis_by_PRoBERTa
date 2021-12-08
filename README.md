@@ -8,7 +8,7 @@
 | Validation | data/dataset_5_validation.csv |    20    |      53      |      277      |
 |    Test    | data/dataset_5_test.csv       |    37    |      71      |      183      |
 
-* The dataset is primarily collected from DeepDDG(https://pubs.acs.org/doi/10.1021/acs.jcim.8b00697) paper. The test set is the same as they proposed. A subset of training examples is randomly choosen from train as validation set. There is not overlapping proteins in train/validation/test set.
+* The dataset is primarily collected from DeepDDG(https://pubs.acs.org/doi/10.1021/acs.jcim.8b00697) paper. The test set is the same as they proposed. A subset of training examples is randomly choosen from train as validation set. There is no overlapping proteins in train/validation/test set.
 * To download, clean and generate fasta sequence:
   * `python data_generators/protein_downloader_and_cleaner.py`
 * Tokenize sequences:
@@ -46,8 +46,12 @@ Download the following pretrained models from PRoBERTa:
 #### Training and testing (2)
 
 * This uses the PRoBERTa final layer features and trained a classifier layer. The report uses this approach since it samples balanced dataset for each batch. It also provides independence to design classification module.
-* To train: `python MutationClassification/train.py`
-* To test: `python MutationClassification/test.py`
+* To train and test Model-0:
+  * Train: `python MutationClassification0/train.py`
+  * Test: `python MutationClassification0/test.py`
+* To train and test Model-1:
+  * To train: `python MutationClassification1/train.py`
+  * To test: `python MutationClassification1/test.py`
 
 #### Analysis
 
