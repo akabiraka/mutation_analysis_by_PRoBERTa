@@ -72,7 +72,7 @@ criterion = nn.CrossEntropyLoss()
 
 test_data_path="data/bpe_tokenized/test.full"
 
-for i in range(1, 13):
+for i in range(13, 16):
     print("Model: ", i)
     model = Net(drop_prob=0.5).to(device)
     model.load_state_dict(torch.load("outputs/models_mut_classify_balanced_data_1/{}_mut_classify.pt".format(i), map_location=torch.device(device)))

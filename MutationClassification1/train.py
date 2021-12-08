@@ -132,9 +132,21 @@ param_grid={
     "batch_size":[32, 64],
     "criterion_weight":[torch.tensor([0.6, 0.4]), torch.tensor([0.5, 0.5]), torch.tensor([0.4, 0.6])]
 }
-
 for run_no, params in enumerate(list(ParameterGrid(param_grid)), 1):
     print("run: ", run_no, params["lr"], params["batch_size"], params["criterion_weight"])
 
     task = Classification(init_lr=params["lr"], batch_size=params["batch_size"], n_epochs=50, criterion_weight=params["criterion_weight"])
     task.run(run_no, train_data_path, val_data_path)    
+
+param_grid={
+    "lr":[0.00001],
+    "batch_size":[64],
+    "criterion_weight":[torch.tensor([0.6, 0.4]), torch.tensor([0.5, 0.5]), torch.tensor([0.4, 0.6])]
+}
+for run_no, params in enumerate(list(ParameterGrid(param_grid)), 13):
+    print("run: ", run_no, params["lr"], params["batch_size"], params["criterion_weight"])
+
+    task = Classification(init_lr=params["lr"], batch_size=params["batch_size"], n_epochs=50, criterion_weight=params["criterion_weight"])
+    task.run(run_no, train_data_path, val_data_path)    
+
+
