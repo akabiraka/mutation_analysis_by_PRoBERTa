@@ -22,4 +22,4 @@
 
 ##python analyzers/vocab_embedding.py 
 ##python analyzers/protein_seq_embedding.py
-python MutationClassification/train.py
+python MutationClassification1/train.py
