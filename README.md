@@ -1,4 +1,5 @@
 # Mutation stability analysis using PRoBERTa
+For further details of the project, the readers are referred to the report [report](https://github.com/akabiraka/mutation_analysis_by_PRoBERTa/blob/main/report/report.pdf) and [presentation](https://github.com/akabiraka/mutation_analysis_by_PRoBERTa/blob/main/report/presentation.pdf).
 
 #### Data preparation
 
