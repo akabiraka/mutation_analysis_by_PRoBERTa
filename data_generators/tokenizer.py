@@ -51,7 +51,11 @@ def tokenize_mutation_seqs(model, dataset_path, prefix):
     if os.path.exists(output_file_path):
         os.remove(output_file_path)
     for i, row in df.iterrows():
-        label = "stabilizing" if row["ddG"]>=0 else "destabilizing"
+        if row["ddG"]>=-1 and row["ddG"]<=1: label="neutral"
+        elif row["ddG"]<-1: label="destabilizing"
+        elif row["ddG"]>1: label="stabilizing"
+
+        # label = "stabilizing" if row["ddG"]>=0 else "destabilizing"
         # inv_label = "stabilizing" if label=="destabilizing" else "destabilizing"
         
         wild_fasta_path = fastas_dir+row["pdb_id"]+row["chain_id"]+".fasta"
