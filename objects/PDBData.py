@@ -45,6 +45,15 @@ class PDBData(object):
         structure = self.parser.get_structure("", pdb_file)[0]
         print(list(structure.get_chains()))
         return list(structure.get_chains())[0].id
+
+    def get_A_or_first_chain_id(self, pdb_id):
+        cln_pdb_file = self.pdb_dir + pdb_id + self.pdb_ext
+        structure = self.parser.get_structure("", cln_pdb_file)[0]
+        chain_ids = list(structure.get_chains())
+        print(chain_ids)
+        for chain_id in chain_ids:
+            if chain_id.id == "A": return "A"
+        return chain_ids[0].id
     
     def clean(self, pdb_id, chain_id, selector=None, clean_pdb_dir="data/pdbs_clean/"):
         """
@@ -128,15 +137,15 @@ class PDBData(object):
         print("Generating fasta {}:{}, Seq-len:{} ... ..".format(pdb_id, chain_id, len(seq)))
         return seq, len(seq)
     
-    def create_mutant_fasta_file(self, wild_fasta_file, mutant_fasta_file, mutation_site, wild_residue, mutation=None):
+    def create_mutant_fasta_file(self, wild_fasta_file, mutant_fasta_file, zero_based_mutation_site, mutant_residue, mutation=None):
         pdbid = wild_fasta_file.split("/")[2].split(".")[0]
-        wild_residue = Polypeptide.three_to_one(wild_residue) if len(wild_residue)==3 else wild_residue
+        mutant_residue = Polypeptide.three_to_one(mutant_residue) if len(mutant_residue)==3 else mutant_residue
         with open(wild_fasta_file, "r") as wild_fasta_reader:
             lines = wild_fasta_reader.readlines()
             # print(lines)
             with open(mutant_fasta_file, 'w') as mutant_fasta_writer:
-                # print(lines[1][mutation_site])# = wild_residue
-                fasta = lines[1][:mutation_site] + wild_residue + lines[1][mutation_site+1:]
+                # print(lines[1][mutation_site])# = mutant_residue
+                fasta = lines[1][:zero_based_mutation_site] + mutant_residue + lines[1][zero_based_mutation_site+1:]
                 mutant_fasta_writer.write(lines[0].rstrip()+":{}\n".format(mutation))
                 mutant_fasta_writer.write(fasta)
     
@@ -208,15 +217,25 @@ class PDBData(object):
     
     def get_residue_ids_dict(self, pdb_file, chain_id):
         residues = PDBParser(QUIET=True).get_structure("", pdb_file)[0][chain_id].get_residues()
-        residue_ids_dict = {residue.id[1]:i for i, residue in enumerate(residues)}
+        residue_ids_dict = {residue.id:i for i, residue in enumerate(residues)}
         return residue_ids_dict
     
-    
-# clean_pdb_file = "data/pdbs_clean/1amqA.pdb" 
-# PDBData = PDBData(pdb_dir="data/pdbs/")
-# residue_ids_dict = PDBData.get_residue_ids_dict(pdb_file=clean_pdb_file, chain_id="A")
-# print(residue_ids_dict)
-# print(get_starting_residue_index(pdb_file=clean_pdb_file))
+    def get_zero_based_mutation_site(self, cln_pdb_file, chain_id, mutation_residue_id):
+        """mutation_residue_id=(hetero_flag, mutation_site, insertion_code)
+        """
+        residue_ids_dict = self.get_residue_ids_dict(pdb_file=cln_pdb_file, chain_id=chain_id)
+        return residue_ids_dict.get(mutation_residue_id)
 
-# print(get_last_residue_id("data/pdbs_clean/1a43A.pdb", "A"))
-# print(get_first_residue_id("data/pdbs_clean/1a43A.pdb", "A"))
+    def does_mutation_site_has_expected_residue(self, cln_pdb_file, chain_id, mutation_residue_id, residue_name):
+        residue = PDBParser(QUIET=True).get_structure("", cln_pdb_file)[0][chain_id][mutation_residue_id]
+        pdb_residue_name = Polypeptide.three_to_one(residue.get_resname())
+        return pdb_residue_name == residue_name, pdb_residue_name
+
+
+# pdb_id="1h7m"    
+# chain_id="A"
+# cln_pdb_file = "data/pdbs_clean/1h7mA.pdb"
+# pdbdata = PDBData(pdb_dir="data/pdbs/")
+# residue_ids_dict = pdbdata.get_residue_ids_dict(pdb_file=cln_pdb_file, chain_id=chain_id)
+# print(residue_ids_dict)
+# pdbdata.get_full_ss_and_sa(pdb_id, chain_id, cln_pdb_file, ss_dict, sa_classification_func=get_sa_type)

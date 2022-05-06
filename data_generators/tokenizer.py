@@ -12,14 +12,12 @@ pretraining_file = "data/pretraining_data_for_tokenizer.txt"
 pretraining_tokenized_file = "data/pretraining_data_tokenized.txt"
 
 tokenizer_model_prefix = "outputs/models/spm_tokenizer"
-tokenizer_model_path = "data/bpe_model/m_reviewed.model" #tokenizer_model_prefix+".model"
+tokenizer_model_path = "data/bpe_model/m_reviewed.model"
 
 fastas_dir = "data/fastas/"
 train_dataset_path = "data/dataset_5_train.csv"
-validation_dataset_path = "data/dataset_5_validation.csv"
 test_dataset_path = "data/dataset_5_test.csv"
-tokenized_dir = "data/bpe_tokenized/" #"data/tokenized/"
-
+tokenized_dir = "data/bpe_tokenized/" 
 
 
 def filter_seqs(force=False):
@@ -89,6 +87,5 @@ if __name__ == "__main__":
     model.load(tokenizer_model_path)
     # tokenize_pretraining_seqs(model)
     tokenize_mutation_seqs(model, dataset_path=train_dataset_path, prefix="train")
-    tokenize_mutation_seqs(model, dataset_path=validation_dataset_path, prefix="val")
     tokenize_mutation_seqs(model, dataset_path=test_dataset_path, prefix="test")
 

@@ -1,6 +1,3 @@
-__author__ = "Anowarul Kabir"
-__updated__ = "2020-08-29 20:13:28"
-
 import sys
 sys.path.append("../mutation_analysis_by_PRoBERTa")
 
@@ -84,8 +81,8 @@ class ChainAndAminoAcidSelect(Select):
             return 0
             
     def accept_residue(self, residue):
-        _, residue_id, insertion_code = residue.id
-        if residue.get_resname() in standard_aa_names and insertion_code==" ":
+        hetero_flag, sequence_identifier, insertion_code = residue.id
+        if residue.get_resname() in standard_aa_names:# and insertion_code==" ":
             # print(residue.get_resname())
             return 1
         else:
